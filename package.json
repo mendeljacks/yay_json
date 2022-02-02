@@ -5,16 +5,12 @@
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "prepare": "husky install"
+        "prepare": "husky install",
+        "bump": "npm version patch --no-git-tag-version"
     },
     "author": "",
     "license": "ISC",
     "devDependencies": {
         "husky": "^7.0.4"
-    },
-    "husky": {
-        "hooks": {
-            "post-merge": "npm --no-git-tag-version version patch"
-        }
     }
 }
