@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+      "target": "ES2017",
+      "module": "commonjs",
+      "declaration": true,
+      "outDir": "./build",
+      "strict": false,
+      "lib": ["ES2019", "DOM"],
+      "downlevelIteration": true
+    },
+    "include": ["src"],
+    "exclude": ["node_modules"]
+  }
