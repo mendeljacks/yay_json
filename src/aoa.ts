@@ -111,7 +111,7 @@ const make_column_groups_from_aoa = aoa => {
     return column_groups
 }
 
-// adds empty rows to the bottom until rows.length >= height. Assumes all rows are of equal width
+// adds empty rows to the bottom until rows.length >= height. Assumes all rows are of equal width.
 const add_empty_rows = (rows, blank_cell_data, desired_height) => {
     if (rows.length === 0) {
         throw Error('Cant figure out desired width for empty rows!')
