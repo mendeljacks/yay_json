@@ -206,6 +206,9 @@ const make_header_rows = column_groups => {
     // converts column groups into two aoa rows (one for the column group names and one for the column names)
     return column_groups.reduce(
         (acc, val) => {
+            if (val.columns.length === 0) {
+                return acc
+            }
             acc[0] = acc[0].concat([val.breadcrumb, ...Array(val.columns.length - 1).fill('')])
             acc[1] = acc[1].concat(val.columns.map(capitalize))
             return acc
