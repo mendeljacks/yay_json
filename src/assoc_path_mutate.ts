@@ -1,4 +1,4 @@
-import { clone, type, isNaN } from 'ramda'
+import { clone, type } from 'ramda'
 
 // just like assocPath, but mutates the input argument and so is more performant
 export const assoc_path_mutate = (path, value, obj) => {
@@ -8,13 +8,13 @@ export const assoc_path_mutate = (path, value, obj) => {
         var p_el = p.shift()
         var next_p_el = p[0]
 
-        if (type(o) === 'Array' && isNaN(p_el)) {
+        if (type(o) === 'Array' && typeof p_el !== 'number') {
             throw Error('Trying to access an array with a non numeric index')
         }
 
         if (!(p_el in o)) {
             // create obj/array if not there yet
-            if (isNaN(next_p_el)) {
+            if (typeof next_p_el !== 'number') {
                 o[p_el] = {}
             } else {
                 o[p_el] = []
