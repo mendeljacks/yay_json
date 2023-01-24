@@ -9,6 +9,7 @@ export const push_path = (path_to_arr, val, obj) => {
         assoc_path_mutate(path_to_arr, [], obj)
     }
 
+    // @ts-ignore
     path(path_to_arr, obj).push(val)
 
     return obj

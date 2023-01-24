@@ -1,4 +1,5 @@
-export const is_simple_object = val => !!val && val.constructor === Object
+export const is_simple_object = val =>
+    !!val && (val.constructor === Object || val.constructor?.name === 'RowDataPacket') // mysql row data packet
 export const deep_get = (
     path_array: (string | number)[],
     obj: any,
