@@ -1,6 +1,6 @@
 {
     "name": "yay_json",
-    "version": "1.0.16",
+    "version": "1.0.21",
     "description": "",
     "main": "build/index.js",
     "files": [
@@ -9,17 +9,44 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "prepare": "husky install",
-        "bump": "tsc && npm version patch --no-git-tag-version && git add package*.json && npm publish"
+        "bump": "tsc && npm version patch --no-git-tag-version && git add package*.json && npm publish",
+        "nt": "nodemon --signal SIGKILL --exec mocha --package package.json"
     },
     "author": "",
     "license": "ISC",
     "devDependencies": {
+        "@types/chai": "^4.3.4",
+        "@types/mocha": "^10.0.1",
         "chai": "^4.3.6",
         "husky": "^7.0.4",
         "mocha": "^9.2.0",
+        "nodemon": "^2.0.20",
+        "sucrase": "^3.29.0",
         "typescript": "^4.5.5"
     },
     "dependencies": {
         "ramda": "^0.28.0"
+    },
+    "nodemonConfig": {
+        "verbose": true,
+        "legacyWatch": true,
+        "ignore": [
+            "node_modules"
+        ],
+        "watch": [
+            "./"
+        ],
+        "signal": "SIGKILL",
+        "exec": "npm run mocha",
+        "ext": "ts, js, jsx, tsx"
+    },
+    "mocha": {
+        "require": [
+            "sucrase/register/ts"
+        ],
+        "spec": [
+            "src/**/*.test.ts"
+        ],
+        "timeout": 0
     }
 }

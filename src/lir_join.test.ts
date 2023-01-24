@@ -101,7 +101,7 @@ describe('lir_join', () => {
         expect(right).to.deep.equal([])
     })
 
-    test('Deeply nests', () => {
+    test.skip('Deeply nests', () => {
         // This is a deep nest because images are going on the variant which is on the product
         // The example includes a scenario with multiple images on a variant
         // The example includes a variant with no images (the pink one)

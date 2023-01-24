@@ -137,3 +137,35 @@
 //         }
 //     }
 // ]
+
+import { expect } from 'chai'
+import {describe, test } from 'mocha'
+import { aoa_to_json } from './aoa'
+
+describe('aoa.ts', () => {
+    describe(aoa_to_json.name, () => {
+        test('handles repeat children', () => {
+            const aoa = [
+                ['Variants', 'Variants > Images', '', 'Variants > Images'],
+                ['Mpn', 'Source Url', 'Bucket Url', 'Source Url'],
+                ['123', 'a.com/1.jpg', 'b.com/1.jpg', 'a.com/2.jpg'],
+                ['', '', '', 'a.com/3.jpg']
+            ]
+
+            const json = aoa_to_json(aoa)
+            expect(json).to.deep.equal({
+                variants: [{
+                    mpn: '123',
+                    images: [{
+                        source_url: 'a.com/1.jpg',
+                        bucket_url: 'b.com/1.jpg'
+                    }, {
+                        source_url: 'a.com/2.jpg'
+                    }, {
+                        source_url: 'a.com/3.jpg'
+                    }]
+                }]
+            })
+        })
+    })
+})

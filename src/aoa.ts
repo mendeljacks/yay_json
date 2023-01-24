@@ -264,29 +264,30 @@ const row_to_json = (row, columns) => {
 
     return json
 }
-// returns the index of the first column belonging to the specified route
-const get_start_column_index = (column_groups, route) => {
+// returns the index of the first column belonging to the specified column group
+const get_start_column_index = (column_groups, column_group_index) => {
     let start_column_index = 0
-    for (const column_group of column_groups) {
-        const breadcrumb = crumb(route)
-        if (column_group.breadcrumb === breadcrumb) {
+    for (let i = 0; i < column_groups.length; i++) {
+        const column_group = column_groups[i]
+        if (i === column_group_index) {
             return start_column_index
         }
-
+        
         start_column_index += column_group.columns.length
     }
 
     throw Error('Could not find specified route in column groups')
 }
-const rollup_rows = (rows, column_groups, route) => {
-    const breadcrumb = crumb(route)
-    const column_group = column_groups.filter(group => group.breadcrumb === breadcrumb)[0]
+const rollup_rows = (rows, column_groups, column_group_index) => {
+    const column_group = column_groups[column_group_index]
     const group_columns = column_group.columns
-    const children = column_group.children
-    const start_column_index = get_start_column_index(column_groups, route) // inclusive
+    const children = [...new Set(column_group.children)] as any[]
+    const start_column_index = get_start_column_index(column_groups, column_group_index) // inclusive
     const end_column_index = start_column_index + group_columns.length // exclusive
 
     const blocks = split_at(row => row_has_data_in(start_column_index, end_column_index, row), rows)
+
+    const route = column_group.path
     const own_jsons = blocks
         .map(block => {
             const own_block_row = block[0].slice(start_column_index, end_column_index)
@@ -294,10 +295,22 @@ const rollup_rows = (rows, column_groups, route) => {
 
             for (const child of children) {
                 const child_route = [...route, child]
-                const child_jsons = rollup_rows(block, column_groups, child_route)
-                if (child_jsons.length > 0) {
-                    own_json[child] = child_jsons
-                }
+
+                // there could be multiple repeats of the same child. In that case, we concat all the jsons together into
+                // on array
+                const child_column_group_indices = column_groups.flatMap((e, i) => {
+                    const is_child_column_group = e.breadcrumb === crumb(child_route)
+                    return is_child_column_group ? [i] : []
+                })
+                child_column_group_indices.forEach((child_column_group_index) => {
+                    const child_jsons = rollup_rows(block, column_groups, child_column_group_index)
+                    if (child_jsons.length > 0) {
+                        if (!own_json[child]) {
+                            own_json[child] = []
+                        }
+                        child_jsons.forEach(e => own_json[child].push(e))
+                    }
+                })
             }
 
             return own_json
@@ -309,8 +322,9 @@ const rollup_rows = (rows, column_groups, route) => {
 }
 
 const make_json_from_rows = (rows, column_groups, table_name) => {
+    const column_group_index = column_groups.findIndex(e => e.breadcrumb === crumb([table_name]))
     return remove_null_rows({
-        [table_name]: rollup_rows(rows, column_groups, [table_name])
+        [table_name]: rollup_rows(rows, column_groups, column_group_index)
     })
 }
 
