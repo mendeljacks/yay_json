@@ -20,8 +20,12 @@ const branches_only = obj =>
         .filter(([key, value]) => Array.isArray(value))
         .reduce((acc, val) => ((acc[val[0]] = val[1]), acc), {})
 const merge_with_concat = (l, r) => {
-    let output = { ...l }
+    let output =  { ...l }
     for (const key in r) {
+        if (r[key] === undefined || r[key] === null) {
+            // if r value is null or undefined, dont overwrite whatever's in l (could be an array)
+            continue
+        }
         if (Array.isArray(r[key])) {
             if (!Array.isArray(output[key])) output[key] = []
             output[key] = [...output[key], ...r[key]]

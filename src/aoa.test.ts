@@ -139,8 +139,8 @@
 // ]
 
 import { expect } from 'chai'
-import {describe, test } from 'mocha'
-import { aoa_to_json } from './aoa'
+import { describe, test } from 'mocha'
+import { aoa_to_json, json_to_aoa } from './aoa'
 
 describe('aoa.ts', () => {
     describe(aoa_to_json.name, () => {
@@ -149,23 +149,45 @@ describe('aoa.ts', () => {
                 ['Variants', 'Variants > Images', '', 'Variants > Images'],
                 ['Mpn', 'Source Url', 'Bucket Url', 'Source Url'],
                 ['123', 'a.com/1.jpg', 'b.com/1.jpg', 'a.com/2.jpg'],
-                ['', '', '', 'a.com/3.jpg']
+                ['', '', '', 'a.com/3.jpg'],
             ]
 
             const json = aoa_to_json(aoa)
             expect(json).to.deep.equal({
-                variants: [{
-                    mpn: '123',
-                    images: [{
-                        source_url: 'a.com/1.jpg',
-                        bucket_url: 'b.com/1.jpg'
-                    }, {
-                        source_url: 'a.com/2.jpg'
-                    }, {
-                        source_url: 'a.com/3.jpg'
-                    }]
-                }]
+                variants: [
+                    {
+                        mpn: '123',
+                        images: [
+                            {
+                                source_url: 'a.com/1.jpg',
+                                bucket_url: 'b.com/1.jpg',
+                            },
+                            {
+                                source_url: 'a.com/2.jpg',
+                            },
+                            {
+                                source_url: 'a.com/3.jpg',
+                            },
+                        ],
+                    },
+                ],
             })
+        })
+        test('handles merge with undefined', () => {
+            const json = {
+                a: [
+                    { name: 'test', b: [{ name: 'test 2' }] },
+                    { name: 'test', b: undefined },
+                ],
+            }
+
+            const aoa = json_to_aoa(json)
+            expect(aoa).to.deep.equal([
+                ['A', 'A > B'],
+                ['Name', 'Name'],
+                ['test', 'test 2'],
+                ['test', ''],
+            ])
         })
     })
 })
