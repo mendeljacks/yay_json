@@ -173,6 +173,46 @@ describe('aoa.ts', () => {
                 ],
             })
         })
+        test('handles skipped nesting', () => {
+            const aoa = [
+                ['A', 'A > B > C'],
+                ['X', 'Y'],
+                ['1', '2'],
+            ]
+
+            const json = aoa_to_json(aoa)
+            expect(json).to.deep.equal({
+                a: [
+                    {
+                        x: '1',
+                        b: [
+                            {
+                                c: [
+                                    {
+                                        y: '2',
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            })
+        })
+        // test.only("doesn't nest incorrectly", () => {
+        //     const aoa = [
+        //         ['A', 'A > B', 'B'],
+        //         ['X', 'Y', 'Z'],
+        //         ['1', '2', '3'],
+        //     ]
+
+        //     const json = aoa_to_json(aoa)
+        //     expect(json).to.deep.equal({
+        //         a: [{ x: '1', b: [{ y: '2' }] }],
+        //         b: [{ z: '3' }],
+        //     })
+        // })
+    })
+    describe(json_to_aoa.name, () => {
         test('handles merge with undefined', () => {
             const json = {
                 a: [

@@ -1,3 +1,6 @@
+import { array_equals } from './array_equals'
+import { push_path } from './push_path'
+
 const last = (arr) => arr[arr.length - 1]
 export const capitalize = (str) =>
     str
@@ -10,7 +13,7 @@ const lowerize = (str) =>
         .map((el) => (el[0] || '').charAt(0).toLowerCase() + el.slice(1))
         .join('_')
 const crumb = (arr) => arr.map(capitalize).join(' > ')
-const decrumb = (str) => str.split(' > ').map(lowerize)
+const decrumb = (str: string) => str.split(' > ').map(lowerize)
 const leaves_only = (obj) =>
     Object.entries(obj)
         .filter(([key, value]) => !Array.isArray(value))
@@ -106,17 +109,39 @@ const make_column_groups_from_aoa = (aoa) => {
             const path = decrumb(breadcrumb)
             const parent = path.length === 1 ? null : path[path.length - 2]
             const column_group = {
-                path: path,
-                breadcrumb: breadcrumb,
+                path,
+                breadcrumb,
                 columns: [],
-                parent: parent,
+                parent,
                 children: [],
             }
-            const ind = column_groups.findIndex(
-                (el) => el.path[el.path.length - 1] === parent
-            )
-            if (ind > -1)
-                column_groups[ind].children.push(path[path.length - 1])
+
+            // choose closest ancestor as the parent
+            const ancestor_details = path.reduce((acc, _, i) => {
+                const cut_index = path.length - 1 - i
+                const path_slice = path.slice(0, cut_index)
+                const ancestor_index = column_groups.findIndex((group) =>
+                    array_equals(group.path, path_slice)
+                )
+                if (ancestor_index != -1) {
+                    return {
+                        ancestor_index,
+                        child_path: path.slice(cut_index, Infinity),
+                    }
+                } else {
+                    return acc
+                }
+            }, undefined)
+
+            if (ancestor_details) {
+                const ancestor_group = column_groups[ancestor_details.ancestor_index]
+                const ancestor_has_child = ancestor_group.children.some(child => array_equals(child, ancestor_details.child_path))
+                if (!ancestor_has_child)
+                ancestor_group.children.push(
+                    ancestor_details.child_path
+                )
+            }
+
             column_groups.push(column_group)
         }
 
@@ -191,7 +216,7 @@ const make_rows = (column_groups, objs, route) => {
 
         const children = column_group.children
         const child_blocks = children.map((child) => {
-            const child_route = [...route, child]
+            const child_route = [...route, ...child]
 
             // if there is no child, put an array with an empty object.
             // This will map to a single block row with all columns from the child group empty.
@@ -336,7 +361,7 @@ const rollup_rows = (rows, column_groups, column_group_index) => {
             const own_json = row_to_json(own_block_row, group_columns)
 
             for (const child of children) {
-                const child_route = [...route, child]
+                const child_route = [...route, ...child]
 
                 // there could be multiple repeats of the same child. In that case, we concat all the jsons together into
                 // on array
@@ -354,12 +379,13 @@ const rollup_rows = (rows, column_groups, column_group_index) => {
                             column_groups,
                             child_column_group_index
                         )
-                        if (child_jsons.length > 0) {
-                            if (!own_json[child]) {
-                                own_json[child] = []
-                            }
-                            child_jsons.forEach((e) => own_json[child].push(e))
-                        }
+
+                        child_jsons.forEach((child_json) => {
+                            const child_array_path = child.flatMap((el, i) =>
+                                i === child.length - 1 ? [el] : [el, 0]
+                            )
+                            push_path(child_array_path, child_json, own_json)
+                        })
                     }
                 )
             }
