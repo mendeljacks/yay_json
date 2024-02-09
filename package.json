@@ -1,6 +1,6 @@
 {
     "name": "yay_json",
-    "version": "1.0.29",
+    "version": "1.0.30",
     "description": "",
     "main": "build/index.js",
     "files": [
