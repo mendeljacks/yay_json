@@ -229,5 +229,21 @@ describe('aoa.ts', () => {
                 ['test', ''],
             ])
         })
+        test('handles multiple children', () => {
+            const json = {
+                aa: [
+                    { name: '1', bb: [{ name: '2' }], cc: [{ name: '3' }] },
+                    { name: 'test', bb: [{ name: '2' }], cc: [{ name: '3' }] },
+                ],
+            }
+
+            const aoa = json_to_aoa(json)
+            expect(aoa).to.deep.equal([
+                ['Aa', 'Aa > Bb', 'Aa > Cc'],
+                ['Name', 'Name', 'Name'],
+                ['1', '2', '3'],
+                ['test', '2', '3'],
+            ])
+        })
     })
 })

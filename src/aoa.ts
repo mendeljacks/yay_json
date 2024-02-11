@@ -47,7 +47,7 @@ const make_column_groups_from_json = (obj = {}, path = [], parent = null) => {
         breadcrumb: crumb(path),
         columns: Object.keys(leaves),
         parent: parent,
-        children: Object.keys(branches),
+        children: Object.keys(branches).map(field => [field]),
     }
 
     // child arrays trigger recursion
