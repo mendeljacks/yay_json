@@ -118,7 +118,7 @@ const make_column_groups_from_aoa = (aoa) => {
 
             // choose closest ancestor as the parent
             const ancestor_details = path.reduce((acc, _, i) => {
-                const cut_index = path.length - 1 - i
+                const cut_index = i
                 const path_slice = path.slice(0, cut_index)
                 const ancestor_index = column_groups.findIndex((group) =>
                     array_equals(group.path, path_slice)

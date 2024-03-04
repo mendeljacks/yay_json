@@ -198,6 +198,42 @@ describe('aoa.ts', () => {
                 ],
             })
         })
+        test('handles skipped nesting', () => {
+            const aoa = [
+                ['A', 'A > B', 'A > B > C'],
+                ['Name', 'Name', 'Name'],
+                ['1', '2', '3'],
+                ['', '4', '5'],
+                // ['', '6', '7'],
+            ]
+
+            const json = aoa_to_json(aoa)
+            expect(json).to.deep.equal({
+                a: [
+                    {
+                        name: '1',
+                        b: [
+                            {
+                                name: '2',
+                                c: [
+                                    {
+                                        name: '3',
+                                    },
+                                ],
+                            },
+                            {
+                                name: '4',
+                                c: [
+                                    {
+                                        name: '5',
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            })
+        })
         // test.only("doesn't nest incorrectly", () => {
         //     const aoa = [
         //         ['A', 'A > B', 'B'],
